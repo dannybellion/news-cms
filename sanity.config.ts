@@ -5,10 +5,12 @@ import {schemaTypes} from './schemaTypes'
 
 export default defineConfig({
   name: 'default',
-  title: 'news',
-
+  title: 'Cycling News CMS',
+  
   projectId: 'qgenersh',
   dataset: 'production',
+  
+  basePath: '/',
 
   plugins: [structureTool(), visionTool()],
 
