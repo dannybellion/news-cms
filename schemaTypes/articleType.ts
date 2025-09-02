@@ -89,20 +89,6 @@ export const articleType = defineType({
       type: 'datetime',
       initialValue: () => new Date().toISOString(),
     }),
-    defineField({
-      name: 'status',
-      title: 'Status',
-      type: 'string',
-      options: {
-        list: [
-          {title: 'Draft', value: 'draft'},
-          {title: 'AI Generated', value: 'ai-generated'},
-          {title: 'In Review', value: 'review'},
-          {title: 'Published', value: 'published'}
-        ]
-      },
-      initialValue: 'draft'
-    }),
     // AI Metadata Fields
     defineField({
       name: 'aiGenerated',
@@ -161,13 +147,12 @@ export const articleType = defineType({
     select: {
       title: 'title',
       author: 'author.name',
-      media: 'featuredImage',
-      status: 'status'
+      media: 'featuredImage'
     },
     prepare(selection) {
-      const {author, status} = selection
+      const {author} = selection
       return Object.assign({}, selection, {
-        subtitle: `${author || 'No author'} • ${status}`
+        subtitle: author || 'No author'
       })
     }
   }
