@@ -15,10 +15,12 @@
     "sanity"
   ],
   "dependencies": {
-    "@sanity/vision": "^4.6.0",
+    "@hello-pangea/dnd": "^18.0.1",
+    "@sanity/client": "^7.11.0",
+    "@sanity/vision": "^4.6.1",
     "react": "^19.1",
     "react-dom": "^19.1",
-    "sanity": "^4.6.0",
+    "sanity": "^4.6.1",
     "styled-components": "^6.1.18"
   },
   "devDependencies": {
