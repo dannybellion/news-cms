@@ -84,6 +84,23 @@ export const articleType = defineType({
       validation: (rule) => rule.required(),
     }),
     defineField({
+      name: 'status',
+      title: 'Status',
+      type: 'string',
+      options: {
+        list: [
+          {title: 'Idea', value: 'idea'},
+          {title: 'Writing', value: 'writing'},
+          {title: 'Draft', value: 'draft'},
+          {title: 'Published', value: 'published'}
+        ],
+        layout: 'radio'
+      },
+      initialValue: 'idea',
+      validation: (rule) => rule.required(),
+      description: 'Workflow status - automatically set to "published" when document is published in Sanity'
+    }),
+    defineField({
       name: 'publishedAt',
       title: 'Published Date',
       type: 'datetime',

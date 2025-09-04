@@ -1,15 +1,28 @@
 export interface Article {
   _id: string
+  _rev: string
   title: string
   author?: {name: string}
   excerpt?: string
-  content?: any[]
+  content?: ContentBlock[]
+  status?: ArticleStatus
   _updatedAt: string
   isDraft: boolean
   isPublished: boolean
 }
 
 export type ArticleStatus = 'idea' | 'writing' | 'draft' | 'published'
+
+export interface ContentBlock {
+  _type: string
+  _key: string
+  style?: string
+  children?: Array<{
+    _type: string
+    _key: string
+    text?: string
+  }>
+}
 
 export interface StatusConfig {
   title: string
@@ -29,6 +42,7 @@ export const GROQ_ARTICLES_QUERY = `*[_type == "article"]{
   title,
   excerpt,
   content,
+  status,
   author->{name},
   _updatedAt,
   "isDraft": _id in path("drafts.**"),

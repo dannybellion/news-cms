@@ -1,7 +1,10 @@
-import {Article, ArticleStatus} from '../types'
+import {Article, ArticleStatus, ContentBlock} from '../types'
 
 export function createOptimisticArticle(article: Article, newStatus: ArticleStatus): Article {
   const optimisticArticle = {...article}
+  
+  // Set the status field directly
+  optimisticArticle.status = newStatus
   
   // Simulate changes needed for new status
   switch (newStatus) {
@@ -22,7 +25,7 @@ export function createOptimisticArticle(article: Article, newStatus: ArticleStat
         _key: 'temp',
         style: 'normal',
         children: [{ _type: 'span', text: ' ', _key: 'temp' }]
-      }]
+      }] as ContentBlock[]
       optimisticArticle.isDraft = true
       optimisticArticle.isPublished = false
       break
@@ -35,7 +38,7 @@ export function createOptimisticArticle(article: Article, newStatus: ArticleStat
           _key: 'temp',
           style: 'normal',
           children: [{ _type: 'span', text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore.', _key: 'temp' }]
-        }]
+        }] as ContentBlock[]
       }
       optimisticArticle.isDraft = true
       optimisticArticle.isPublished = false
