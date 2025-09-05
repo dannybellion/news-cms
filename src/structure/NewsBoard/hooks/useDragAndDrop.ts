@@ -45,8 +45,12 @@ export function useDragAndDrop({articles, setArticles, updateArticleStatus}: Use
     const newStatus = destination.droppableId as ArticleStatus
     const currentStatus = deriveArticleStatus(articles.find(a => a._id === draggableId)!)
     
+    console.log('Drop debug:', { draggableId, currentStatus, newStatus, willUpdate: currentStatus !== newStatus })
+    
     // Only update if status actually changed
     if (currentStatus !== newStatus) {
+      console.log('About to call updateArticleStatus')
+      
       // Optimistic update - move card immediately in UI
       setArticles(prev => updateArticlesOptimistically(prev, draggableId, newStatus))
       
@@ -54,7 +58,14 @@ export function useDragAndDrop({articles, setArticles, updateArticleStatus}: Use
       const originalStatus = draggedArticleOriginalStatus?.originalStatus || currentStatus
       
       // Then update server (with backend integration)
-      updateArticleStatus(draggableId, newStatus, originalStatus)
+      console.log('Calling updateArticleStatus now')
+      // Add delay to let optimistic updates settle and reduce race conditions
+      setTimeout(() => {
+        updateArticleStatus(draggableId, newStatus, originalStatus)
+        console.log('updateArticleStatus call completed')
+      }, 100)
+    } else {
+      console.log('Status unchanged, skipping update')
     }
     
     // Clear the stored original status

@@ -2,9 +2,10 @@ import React, {useState} from 'react'
 import {Card, Text} from '@sanity/ui'
 import {Draggable, DraggableProvided, DraggableStateSnapshot} from '@hello-pangea/dnd'
 import {IntentLink} from 'sanity/router'
-import {Article, ArticleStatus, statusConfig, Category} from '../types'
+import {Article, ArticleStatus, statusConfig} from '../types'
 import {EngagementSquare} from './EngagementSquare'
 import {EngagementRatingModal} from './EngagementRatingModal'
+import {BackendSuccessCheckmark} from './BackendSuccessCheckmark'
 
 interface ArticleCardProps {
   article: Article
@@ -107,6 +108,7 @@ export function ArticleCard({article, status, index, isDragging, onRatingUpdate}
                   onClick={handleEngagementClick}
                 />
               )}
+              <BackendSuccessCheckmark show={!!article.backendSuccess} />
               <EngagementRatingModal
                 isOpen={showRatingModal}
                 position={modalPosition}

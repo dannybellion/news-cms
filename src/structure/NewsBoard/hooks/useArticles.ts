@@ -68,25 +68,37 @@ export function useArticles() {
   }, [client]) // Remove GROQ_ARTICLES_QUERY from dependencies
 
   const updateArticleStatus = async (articleId: string, newStatus: ArticleStatus, originalStatus?: ArticleStatus) => {
+    console.log('updateArticleStatus called:', { articleId, newStatus, originalStatus })
+    
     try {
       const article = articles.find(a => a._id === articleId)
-      if (!article) return
+      if (!article) {
+        console.log('Article not found:', articleId)
+        return
+      }
+      
+      console.log('Article found:', { isDraft: article.isDraft, isPublished: article.isPublished })
       
       // Handle publishing: draft -> published
       if (newStatus === 'published' && article.isDraft) {
+        console.log('Taking publish path')
         await publishArticle(article, articleId)
         return
       }
       
       // Handle unpublishing: published -> draft status  
       if (newStatus !== 'published' && article.isPublished && !article.isDraft) {
+        console.log('Taking unpublish path')
         await unpublishArticle(article, articleId, newStatus)
         return
       }
       
       // Handle draft status changes
       if (article.isDraft) {
+        console.log('Taking draft update path')
         await updateDraftArticle(article, articleId, newStatus, originalStatus)
+      } else {
+        console.log('No path taken - article is not draft and conditions not met')
       }
     } catch (error) {
       console.error('Error updating article status:', error)
@@ -121,6 +133,8 @@ export function useArticles() {
   }
 
   const updateDraftArticle = async (article: Article, articleId: string, newStatus: ArticleStatus, originalStatus?: ArticleStatus) => {
+    console.log('updateDraftArticle called:', { articleId, newStatus, originalStatus })
+    
     const updates: any = { status: newStatus }
     
     // Content modifications based on status
@@ -135,18 +149,45 @@ export function useArticles() {
       }]
     }
     
-    await client.patch(articleId).set(updates).commit()
+    console.log('Updating Sanity document with:', updates)
+    try {
+      await client.patch(articleId).set(updates).commit()
+      console.log('Sanity update completed')
+    } catch (error) {
+      console.error('Sanity patch failed:', error)
+      throw error
+    }
     
     // Handle backend integration for writing status
     if (newStatus === 'writing') {
+      console.log('Calling handleWritingBackend')
       await handleWritingBackend(articleId, originalStatus)
+    } else {
+      console.log('Not calling backend - status is not writing:', newStatus)
     }
   }
 
   const handleWritingBackend = async (articleId: string, originalStatus?: ArticleStatus) => {
     try {
       await triggerWritingBackend(articleId)
-      // Visual feedback now comes from shimmer on article card title
+      console.log('Backend call successful - setting success flag')
+      
+      // Mark backend success in the article state
+      setArticles(prev => prev.map(article => 
+        article._id === articleId 
+          ? { ...article, backendSuccess: true }
+          : article
+      ))
+      
+      // Clear the success flag after 3 seconds
+      setTimeout(() => {
+        setArticles(prev => prev.map(article => 
+          article._id === articleId 
+            ? { ...article, backendSuccess: false }
+            : article
+        ))
+      }, 3000)
+      
     } catch (error) {
       console.error('Backend trigger failed:', error)
       

@@ -13,6 +13,7 @@ export interface Article {
   idea?: {
     engagementRating?: string
   }
+  backendSuccess?: boolean
 }
 
 export interface Category {
