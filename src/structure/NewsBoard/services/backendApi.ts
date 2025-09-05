@@ -16,7 +16,7 @@ interface TriggerPlanningResponse {
   message?: string
 }
 
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:8000'
+const BACKEND_URL = process.env.SANITY_STUDIO_BACKEND_URL || 'http://localhost:8000'
 const TIMEOUT_MS = 5000
 
 export class BackendApiError extends Error {

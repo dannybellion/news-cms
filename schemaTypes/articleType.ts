@@ -67,6 +67,11 @@ export const articleType = defineType({
     }),
     // Main article fields
     defineField({
+      name: 'title',
+      title: 'Title',
+      type: 'string',
+    }),
+    defineField({
       name: 'slug',
       title: 'Slug',
       type: 'slug',
