@@ -1,4 +1,5 @@
 import {defineField, defineType} from 'sanity'
+import React from 'react'
 
 export const articleType = defineType({
   name: 'article',
@@ -76,6 +77,32 @@ export const articleType = defineType({
       title: 'Slug',
       type: 'slug',
       options: {source: 'title'},
+      components: {
+        field: (props: any) => {
+          const previewUrl = process.env.SANITY_STUDIO_PREVIEW_URL || 'http://localhost:4321'
+          return React.createElement(
+            'div',
+            null,
+            props.renderDefault(props),
+            props.value?.current && React.createElement(
+              'a',
+              {
+                href: `${previewUrl}/preview/${props.value.current}`,
+                target: '_blank',
+                style: {
+                  marginTop: '8px',
+                  display: 'inline-block',
+                  color: '#0066cc',
+                  textDecoration: 'none',
+                  fontSize: '14px',
+                  fontWeight: '500'
+                }
+              },
+              '→ Preview Article'
+            )
+          )
+        }
+      }
     }),
     defineField({
       name: 'content',
