@@ -9,6 +9,9 @@ export interface Article {
   _updatedAt: string
   isDraft: boolean
   isPublished: boolean
+  idea?: {
+    engagementRating?: string
+  }
 }
 
 export type ArticleStatus = 'idea' | 'writing' | 'draft' | 'published'
@@ -44,6 +47,7 @@ export const GROQ_ARTICLES_QUERY = `*[_type == "article"]{
   content,
   status,
   author->{name},
+  idea,
   _updatedAt,
   "isDraft": _id in path("drafts.**"),
   "isPublished": !(_id in path("drafts.**"))

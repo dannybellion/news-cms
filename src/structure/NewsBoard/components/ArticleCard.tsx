@@ -3,6 +3,7 @@ import {Card, Text} from '@sanity/ui'
 import {Draggable, DraggableProvided, DraggableStateSnapshot} from '@hello-pangea/dnd'
 import {IntentLink} from 'sanity/router'
 import {Article, ArticleStatus, statusConfig} from '../types'
+import {EngagementTriangle} from './EngagementTriangle'
 
 interface ArticleCardProps {
   article: Article
@@ -45,7 +46,9 @@ export function ArticleCard({article, status, index, isDragging}: ArticleCardPro
                 cursor: snapshot.isDragging ? 'grabbing' : 'pointer',
                 borderLeft: `4px solid ${statusConfig[status].color}`,
                 transition: 'all 0.2s ease',
-                transform: snapshot.isDragging ? 'rotate(5deg)' : 'rotate(0deg)'
+                transform: snapshot.isDragging ? 'rotate(5deg)' : 'rotate(0deg)',
+                position: 'relative',
+                overflow: 'hidden'
               }}
               tone="default"
             >
@@ -55,6 +58,9 @@ export function ArticleCard({article, status, index, isDragging}: ArticleCardPro
               <Text size={1} muted>
                 {article.author?.name || 'No author'}
               </Text>
+              {article.idea?.engagementRating && (
+                <EngagementTriangle rating={article.idea.engagementRating} />
+              )}
             </Card>
           </IntentLink>
         </div>
