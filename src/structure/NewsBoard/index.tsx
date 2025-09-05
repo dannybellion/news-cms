@@ -3,6 +3,7 @@ import {Box, Text, Flex, Button} from '@sanity/ui'
 import {DragDropContext} from '@hello-pangea/dnd'
 import {Toaster} from 'react-hot-toast'
 import toast from 'react-hot-toast'
+import {useClient} from 'sanity'
 import {ArticleStatus, statusConfig} from './types'
 import {useArticles} from './hooks/useArticles'
 import {useDragAndDrop} from './hooks/useDragAndDrop'
@@ -17,11 +18,27 @@ export function NewsBoard() {
     updateArticleStatus
   })
   const [isPlanning, setIsPlanning] = useState(false)
+  const client = useClient({apiVersion: '2024-01-01'})
 
   // Connect rollback function from drag hook to articles hook
   useEffect(() => {
     setRollback(rollbackToOriginalStatus)
   }, [setRollback, rollbackToOriginalStatus])
+
+  const handleRatingUpdate = async (articleId: string, rating: string) => {
+    try {
+      const article = articles.find(a => a._id === articleId)
+      if (!article) return
+      
+      // Update the engagement rating in the idea object
+      await client.patch(articleId).set({
+        'idea.engagementRating': rating
+      }).commit()
+    } catch (error) {
+      console.error('Error updating engagement rating:', error)
+      toast.error('Failed to update engagement rating')
+    }
+  }
 
   const handleFindNews = async () => {
     setIsPlanning(true)
@@ -80,6 +97,7 @@ export function NewsBoard() {
                 status={status}
                 articles={articles}
                 isDragging={isDragging}
+                onRatingUpdate={handleRatingUpdate}
               />
             ))}
           </Flex>

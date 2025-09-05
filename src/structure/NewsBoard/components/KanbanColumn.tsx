@@ -1,7 +1,7 @@
 import React from 'react'
 import {Box} from '@sanity/ui'
 import {Droppable, DroppableProvided, DroppableStateSnapshot} from '@hello-pangea/dnd'
-import {Article, ArticleStatus} from '../types'
+import {Article, ArticleStatus, Category} from '../types'
 import {getArticlesByStatus} from '../utils/statusUtils'
 import {StatusHeader} from './StatusHeader'
 import {ArticleCard} from './ArticleCard'
@@ -10,9 +10,10 @@ interface KanbanColumnProps {
   status: ArticleStatus
   articles: Article[]
   isDragging: boolean
+  onRatingUpdate: (articleId: string, rating: string) => void
 }
 
-export function KanbanColumn({status, articles, isDragging}: KanbanColumnProps) {
+export function KanbanColumn({status, articles, isDragging, onRatingUpdate}: KanbanColumnProps) {
   const statusArticles = getArticlesByStatus(articles, status)
 
   return (
@@ -45,6 +46,7 @@ export function KanbanColumn({status, articles, isDragging}: KanbanColumnProps) 
                 status={status}
                 index={index}
                 isDragging={isDragging}
+                onRatingUpdate={onRatingUpdate}
               />
             ))}
             {provided.placeholder}
