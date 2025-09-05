@@ -21,13 +21,13 @@ export const articleType = defineType({
           name: 'brief',
           title: 'Brief',
           type: 'text',
-          rows: 2
+          rows: 3
         },
         {
           name: 'editorialLogic',
           title: 'Editorial Logic',
           type: 'text',
-          rows: 2
+          rows: 3
         },
         {
           name: 'engagementRating',
