@@ -146,7 +146,7 @@ export function useArticles() {
   const handleWritingBackend = async (articleId: string, originalStatus?: ArticleStatus) => {
     try {
       await triggerWritingBackend(articleId)
-      toast.success('Processing started successfully')
+      // Visual feedback now comes from shimmer on article card title
     } catch (error) {
       console.error('Backend trigger failed:', error)
       

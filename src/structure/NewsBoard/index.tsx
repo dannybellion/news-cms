@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react'
+import React, {useEffect, useState, useRef} from 'react'
 import {Box, Text, Flex, Button} from '@sanity/ui'
 import {DragDropContext} from '@hello-pangea/dnd'
 import {Toaster} from 'react-hot-toast'
@@ -12,18 +12,29 @@ import {triggerPlanningBackend, BackendApiError} from './services/backendApi'
 
 export function NewsBoard() {
   const {articles, setArticles, loading, updateArticleStatus, setRollback} = useArticles()
+  const previousArticleCount = useRef(articles.length)
   const {isDragging, onDragStart, onDragEnd, rollbackToOriginalStatus} = useDragAndDrop({
     articles,
     setArticles,
     updateArticleStatus
   })
   const [isPlanning, setIsPlanning] = useState(false)
+  const [statusMessage, setStatusMessage] = useState('')
+  const [showStatus, setShowStatus] = useState(false)
   const client = useClient({apiVersion: '2024-01-01'})
 
   // Connect rollback function from drag hook to articles hook
   useEffect(() => {
     setRollback(rollbackToOriginalStatus)
   }, [setRollback, rollbackToOriginalStatus])
+
+  // Hide status when new articles are created
+  useEffect(() => {
+    if (showStatus && articles.length > previousArticleCount.current) {
+      hideStatus()
+    }
+    previousArticleCount.current = articles.length
+  }, [articles.length, showStatus])
 
   const handleRatingUpdate = async (articleId: string, rating: string) => {
     try {
@@ -40,13 +51,36 @@ export function NewsBoard() {
     }
   }
 
+  const showProgressiveStatus = () => {
+    const messages = [
+      'Scraping RSS feeds...',
+      'Saving to database...',
+      'Comparing against historic articles...',
+      'Creating news stories...'
+    ]
+    
+    setShowStatus(true)
+    
+    messages.forEach((message, index) => {
+      setTimeout(() => {
+        setStatusMessage(message)
+      }, index * 3000)
+    })
+  }
+
+  const hideStatus = () => {
+    setShowStatus(false)
+    setStatusMessage('')
+  }
+
   const handleFindNews = async () => {
     setIsPlanning(true)
     try {
       await triggerPlanningBackend()
-      toast.success('News planning started successfully!')
+      showProgressiveStatus()
     } catch (error) {
       console.error('Planning failed:', error)
+      hideStatus()
       if (error instanceof BackendApiError) {
         toast.error(`Planning failed: ${error.message}`)
       } else {
@@ -67,6 +101,13 @@ export function NewsBoard() {
 
   return (
     <>
+      <style>{`
+        @keyframes shimmer {
+          0% { opacity: 0.5; }
+          50% { opacity: 1; }
+          100% { opacity: 0.5; }
+        }
+      `}</style>
       <Toaster
         position="top-right"
         toastOptions={{
@@ -83,12 +124,25 @@ export function NewsBoard() {
         <Box padding={4}>
           <Text size={3} weight="bold">News Board</Text>
           <Box marginTop={3} marginBottom={2}>
-            <Button 
-              text={isPlanning ? "Finding News..." : "Find News"} 
-              tone="primary" 
-              onClick={handleFindNews}
-              disabled={isPlanning}
-            />
+            <Flex align="center" gap={3}>
+              <Button 
+                text={isPlanning ? "Finding News..." : "Find News"} 
+                tone="primary" 
+                onClick={handleFindNews}
+                disabled={isPlanning}
+              />
+              {showStatus && (
+                <Text 
+                  size={1} 
+                  muted
+                  style={{
+                    animation: 'shimmer 1.5s ease-in-out infinite'
+                  }}
+                >
+                  {statusMessage}
+                </Text>
+              )}
+            </Flex>
           </Box>
           <Flex gap={3} style={{minHeight: '600px', overflowX: 'auto'}}>
             {(Object.keys(statusConfig) as Array<ArticleStatus>).map(status => (

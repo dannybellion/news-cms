@@ -42,6 +42,14 @@ export function ArticleCard({article, status, index, isDragging, onRatingUpdate}
         .article-card:hover {
           background-color: #f5f5f5 !important;
         }
+        @keyframes shimmer {
+          0% { opacity: 0.6; }
+          50% { opacity: 1; }
+          100% { opacity: 0.6; }
+        }
+        .writing-shimmer {
+          animation: shimmer 2s ease-in-out infinite;
+        }
       `}</style>
       <Draggable key={article._id} draggableId={article._id} index={index}>
       {(provided: DraggableProvided, snapshot: DraggableStateSnapshot) => (
@@ -82,7 +90,12 @@ export function ArticleCard({article, status, index, isDragging, onRatingUpdate}
               tone="default"
               className="article-card"
             >
-              <Text size={1} weight="medium" style={{marginBottom: '16px'}}>
+              <Text 
+                size={1} 
+                weight="medium" 
+                style={{marginBottom: '16px'}}
+                className={status === 'writing' ? 'writing-shimmer' : ''}
+              >
                 {article.title}
               </Text>
               <Text size={1} muted>
