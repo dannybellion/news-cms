@@ -3,7 +3,7 @@ import {Card, Text} from '@sanity/ui'
 import {Draggable, DraggableProvided, DraggableStateSnapshot} from '@hello-pangea/dnd'
 import {IntentLink} from 'sanity/router'
 import {Article, ArticleStatus, statusConfig} from '../types'
-import {EngagementTriangle} from './EngagementTriangle'
+import {EngagementSquare} from './EngagementSquare'
 
 interface ArticleCardProps {
   article: Article
@@ -52,14 +52,14 @@ export function ArticleCard({article, status, index, isDragging}: ArticleCardPro
               }}
               tone="default"
             >
-              <Text size={1} weight="medium" style={{marginBottom: '8px'}}>
+              <Text size={1} weight="medium" style={{marginBottom: '16px'}}>
                 {article.title}
               </Text>
               <Text size={1} muted>
                 {article.author?.name || 'No author'}
               </Text>
               {article.idea?.engagementRating && (
-                <EngagementTriangle rating={article.idea.engagementRating} />
+                <EngagementSquare rating={article.idea.engagementRating} />
               )}
             </Card>
           </IntentLink>

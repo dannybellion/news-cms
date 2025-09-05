@@ -1,19 +1,19 @@
 import React from 'react'
 import {Box, Text} from '@sanity/ui'
 
-interface EngagementTriangleProps {
+interface EngagementSquareProps {
   rating: string
 }
 
-export function EngagementTriangle({rating}: EngagementTriangleProps) {
+export function EngagementSquare({rating}: EngagementSquareProps) {
   return (
     <Box
       style={{
         position: 'absolute',
         bottom: '8px',
         right: '8px',
-        width: '20px',
-        height: '20px',
+        width: '16px',
+        height: '16px',
         backgroundColor: '#DC2626',
         borderRadius: '2px',
         display: 'flex',
@@ -27,7 +27,7 @@ export function EngagementTriangle({rating}: EngagementTriangleProps) {
         weight="bold"
         style={{
           color: 'white',
-          fontSize: '10px',
+          fontSize: '8px',
           lineHeight: '1',
           userSelect: 'none'
         }}
