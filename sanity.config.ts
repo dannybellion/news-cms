@@ -1,6 +1,7 @@
 import {defineConfig} from 'sanity'
 import {structureTool} from 'sanity/structure'
 import {visionTool} from '@sanity/vision'
+import {presentationTool} from 'sanity/presentation'
 import {schemaTypes} from './schemaTypes'
 import {newsPlugin} from './src/plugins/newsPlugin'
 import {publishWithStatusAction} from './src/actions/publishWithStatus'
@@ -18,7 +19,13 @@ export default defineConfig({
   plugins: [
     structureTool(),
     newsPlugin(),
-    visionTool()
+    visionTool(),
+    presentationTool({
+      previewUrl: {
+        origin: process.env.SANITY_STUDIO_PREVIEW_URL || 'http://localhost:4321',
+        preview: '/preview',
+      },
+    }),
   ],
 
   schema: {
