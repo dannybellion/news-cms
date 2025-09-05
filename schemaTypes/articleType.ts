@@ -5,25 +5,72 @@ export const articleType = defineType({
   title: 'Article',
   type: 'document',
   fields: [
+    // Core idea/content item structure
     defineField({
-      name: 'title',
-      title: 'Title',
-      type: 'string',
-      validation: (rule) => rule.required().max(100),
+      name: 'idea',
+      title: 'Content Idea',
+      type: 'object',
+      fields: [
+        {
+          name: 'title',
+          title: 'Title',
+          type: 'string',
+          validation: (rule) => rule.required()
+        },
+        {
+          name: 'brief',
+          title: 'Brief',
+          type: 'text',
+          rows: 2
+        },
+        {
+          name: 'editorialLogic',
+          title: 'Editorial Logic',
+          type: 'text',
+          rows: 2
+        },
+        {
+          name: 'engagementRating',
+          title: 'Engagement Rating',
+          type: 'string',
+          options: {
+            list: [
+              {title: 'HC', value: 'HC'},
+              {title: '1', value: '1'},
+              {title: '2', value: '2'},
+              {title: '3', value: '3'},
+              {title: '4', value: '4'}
+            ]
+          }
+        },
+        {
+          name: 'sourceMaterial',
+          title: 'Source Material',
+          type: 'array',
+          of: [
+            {
+              type: 'object',
+              fields: [
+                {name: 'url', type: 'url', title: 'URL', validation: (rule) => rule.required()},
+                {name: 'source', type: 'string', title: 'Source', validation: (rule) => rule.required()},
+                {name: 'title', type: 'string', title: 'Title', validation: (rule) => rule.required()},
+                {name: 'summary', type: 'text', title: 'Summary', validation: (rule) => rule.required()},
+              ]
+            }
+          ]
+        }
+      ],
+      options: {
+        collapsible: true,
+        collapsed: true
+      }
     }),
+    // Main article fields
     defineField({
       name: 'slug',
       title: 'Slug',
       type: 'slug',
       options: {source: 'title'},
-      validation: (rule) => rule.required(),
-    }),
-    defineField({
-      name: 'excerpt',
-      title: 'Excerpt',
-      type: 'text',
-      rows: 4,
-      validation: (rule) => rule.max(300),
     }),
     defineField({
       name: 'content',
@@ -58,23 +105,38 @@ export const articleType = defineType({
       ]
     }),
     defineField({
-      name: 'featuredImage',
-      title: 'Featured Image',
-      type: 'image',
-      options: {hotspot: true},
-      fields: [
-        {
-          name: 'alt',
-          type: 'string',
-          title: 'Alternative text',
-        }
-      ]
+      name: 'excerpt',
+      title: 'Excerpt',
+      type: 'text',
+      rows: 4,
+      validation: (rule) => rule.max(300),
     }),
     defineField({
-      name: 'categories',
-      title: 'Categories',
+      name: 'createdAt',
+      title: 'Created At',
+      type: 'datetime',
+      initialValue: () => new Date().toISOString(),
+    }),
+    defineField({
+      name: 'updatedAt',
+      title: 'Updated At',
+      type: 'datetime',
+    }),
+    defineField({
+      name: 'publishedAt',
+      title: 'Published At',
+      type: 'datetime',
+    }),
+    defineField({
+      name: 'topic',
+      title: 'Topic',
+      type: 'string',
+    }),
+    defineField({
+      name: 'tags',
+      title: 'Tags',
       type: 'array',
-      of: [{type: 'reference', to: {type: 'category'}}]
+      of: [{type: 'string'}],
     }),
     defineField({
       name: 'author',
@@ -83,6 +145,7 @@ export const articleType = defineType({
       to: {type: 'author'},
       validation: (rule) => rule.required(),
     }),
+    // Workflow and AI fields
     defineField({
       name: 'status',
       title: 'Status',
@@ -101,39 +164,29 @@ export const articleType = defineType({
       description: 'Workflow status - automatically set to "published" when document is published in Sanity'
     }),
     defineField({
-      name: 'publishedAt',
-      title: 'Published Date',
-      type: 'datetime',
-      initialValue: () => new Date().toISOString(),
-    }),
-    // AI Metadata Fields
-    defineField({
       name: 'aiGenerated',
       title: 'AI Generated',
       type: 'boolean',
       initialValue: false,
     }),
     defineField({
-      name: 'aiConfidence',
-      title: 'AI Confidence Score',
-      type: 'number',
-      validation: (rule) => rule.min(0).max(100),
-      hidden: ({document}) => !document?.aiGenerated
+      name: 'featuredImage',
+      title: 'Featured Image',
+      type: 'image',
+      options: {hotspot: true},
+      fields: [
+        {
+          name: 'alt',
+          type: 'string',
+          title: 'Alternative text',
+        }
+      ]
     }),
     defineField({
-      name: 'sources',
-      title: 'Sources',
+      name: 'categories',
+      title: 'Categories',
       type: 'array',
-      of: [
-        {
-          type: 'object',
-          fields: [
-            {name: 'title', type: 'string', title: 'Source Title'},
-            {name: 'url', type: 'url', title: 'Source URL'}
-          ]
-        }
-      ],
-      hidden: ({document}) => !document?.aiGenerated
+      of: [{type: 'reference', to: {type: 'category'}}]
     }),
     // SEO Fields
     defineField({
@@ -167,8 +220,9 @@ export const articleType = defineType({
       media: 'featuredImage'
     },
     prepare(selection) {
-      const {author} = selection
+      const {title, author} = selection
       return Object.assign({}, selection, {
+        title: title || 'Untitled',
         subtitle: author || 'No author'
       })
     }

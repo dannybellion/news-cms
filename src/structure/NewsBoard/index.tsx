@@ -1,11 +1,13 @@
-import React, {useEffect} from 'react'
-import {Box, Text, Flex} from '@sanity/ui'
+import React, {useEffect, useState} from 'react'
+import {Box, Text, Flex, Button} from '@sanity/ui'
 import {DragDropContext} from '@hello-pangea/dnd'
 import {Toaster} from 'react-hot-toast'
+import toast from 'react-hot-toast'
 import {ArticleStatus, statusConfig} from './types'
 import {useArticles} from './hooks/useArticles'
 import {useDragAndDrop} from './hooks/useDragAndDrop'
 import {KanbanColumn} from './components/KanbanColumn'
+import {triggerPlanningBackend, BackendApiError} from './services/backendApi'
 
 export function NewsBoard() {
   const {articles, setArticles, loading, updateArticleStatus, setRollback} = useArticles()
@@ -14,11 +16,29 @@ export function NewsBoard() {
     setArticles,
     updateArticleStatus
   })
+  const [isPlanning, setIsPlanning] = useState(false)
 
   // Connect rollback function from drag hook to articles hook
   useEffect(() => {
     setRollback(rollbackToOriginalStatus)
   }, [setRollback, rollbackToOriginalStatus])
+
+  const handleFindNews = async () => {
+    setIsPlanning(true)
+    try {
+      await triggerPlanningBackend()
+      toast.success('News planning started successfully!')
+    } catch (error) {
+      console.error('Planning failed:', error)
+      if (error instanceof BackendApiError) {
+        toast.error(`Planning failed: ${error.message}`)
+      } else {
+        toast.error('Planning failed, please try again')
+      }
+    } finally {
+      setIsPlanning(false)
+    }
+  }
 
   if (loading) {
     return (
@@ -44,7 +64,15 @@ export function NewsBoard() {
       />
       <DragDropContext onDragStart={onDragStart} onDragEnd={onDragEnd}>
         <Box padding={4}>
-          <Text size={3} weight="bold" marginBottom={4}>News Board</Text>
+          <Text size={3} weight="bold">News Board</Text>
+          <Box marginTop={3} marginBottom={2}>
+            <Button 
+              text={isPlanning ? "Finding News..." : "Find News"} 
+              tone="primary" 
+              onClick={handleFindNews}
+              disabled={isPlanning}
+            />
+          </Box>
           <Flex gap={3} style={{minHeight: '600px', overflowX: 'auto'}}>
             {(Object.keys(statusConfig) as Array<ArticleStatus>).map(status => (
               <KanbanColumn

@@ -49,7 +49,7 @@ export function ArticleCard({article, status, index, isDragging}: ArticleCardPro
               }}
               tone="default"
             >
-              <Text size={2} weight="medium" style={{marginBottom: '8px'}}>
+              <Text size={1} weight="medium" style={{marginBottom: '8px'}}>
                 {article.title}
               </Text>
               <Text size={1} muted>
