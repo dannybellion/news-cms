@@ -69,6 +69,30 @@ The system includes dedicated support for AI-generated content with:
 - Consistent alt text requirements for accessibility
 - Caption support for inline content images
 
+## Backend API Integration
+
+The studio integrates with a backend API for AI article writing and planning functionality:
+
+### Authentication
+- All API requests require authentication via `Authorization: Bearer` header
+- API key is stored in `SANITY_STUDIO_API_KEY` environment variable
+- Key: `mXhGW4TaxCUmjwWk0iRr-0d0oPUG05p1PpvHqPCwfFU`
+
+### Endpoints
+- **POST** `/articles/trigger-writing` - Trigger AI writing for an article
+- **POST** `/planning/trigger-planning` - Trigger news planning process
+
+### Environment Setup
+Required environment variables:
+- `SANITY_STUDIO_BACKEND_URL` - Backend API base URL (default: http://localhost:8000)
+- `SANITY_STUDIO_API_KEY` - Bearer token for API authentication
+- `SANITY_STUDIO_PREVIEW_URL` - Preview URL for content preview
+
+### Security Notes
+- API key is visible in client-side code (typical for studio environments)
+- CORS is configured to only allow requests from Sanity domains and localhost:3333
+- Use HTTPS in production for encrypted communication
+
 ## Development Notes
 
 - The project uses React 19 and modern TypeScript

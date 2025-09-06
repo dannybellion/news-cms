@@ -17,6 +17,7 @@ interface TriggerPlanningResponse {
 }
 
 const BACKEND_URL = process.env.SANITY_STUDIO_BACKEND_URL || 'http://localhost:8000'
+const API_KEY = process.env.SANITY_STUDIO_API_KEY
 const TIMEOUT_MS = 5000
 
 export class BackendApiError extends Error {
@@ -31,10 +32,15 @@ export async function triggerWritingBackend(articleId: string): Promise<void> {
   const timeoutId = setTimeout(() => controller.abort(), TIMEOUT_MS)
 
   try {
+    if (!API_KEY) {
+      throw new BackendApiError('API key not configured')
+    }
+
     const response = await fetch(`${BACKEND_URL}/articles/trigger-writing`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'Authorization': `Bearer ${API_KEY}`,
       },
       body: JSON.stringify({
         article_id: articleId
@@ -45,6 +51,9 @@ export async function triggerWritingBackend(articleId: string): Promise<void> {
     clearTimeout(timeoutId)
 
     if (!response.ok) {
+      if (response.status === 401) {
+        throw new BackendApiError('Unauthorized: Check API key configuration', response.status)
+      }
       throw new BackendApiError(
         `Backend request failed: ${response.statusText}`,
         response.status
@@ -79,10 +88,15 @@ export async function triggerPlanningBackend(): Promise<void> {
   const timeoutId = setTimeout(() => controller.abort(), TIMEOUT_MS)
 
   try {
+    if (!API_KEY) {
+      throw new BackendApiError('API key not configured')
+    }
+
     const response = await fetch(`${BACKEND_URL}/planning/trigger-planning`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'Authorization': `Bearer ${API_KEY}`,
       },
       body: JSON.stringify({} as TriggerPlanningRequest),
       signal: controller.signal
@@ -91,6 +105,9 @@ export async function triggerPlanningBackend(): Promise<void> {
     clearTimeout(timeoutId)
 
     if (!response.ok) {
+      if (response.status === 401) {
+        throw new BackendApiError('Unauthorized: Check API key configuration', response.status)
+      }
       throw new BackendApiError(
         `Backend request failed: ${response.statusText}`,
         response.status
